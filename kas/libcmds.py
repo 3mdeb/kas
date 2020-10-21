@@ -127,10 +127,18 @@ class SetupHome(Command):
             fds.write('\n')
         with open(self.tmpdirname + '/.netrc', 'w') as fds:
             fds.write('\n')
+
+        gitconfig = ('[User]\n'
+                     '\temail = kas@example.com\n'
+                     '\tname = Kas User\n')
+
+        if os.environ.get('CI_JOB_TOKEN', False):
+            print('CI_JOB_TOKEN found')
+            gitconfig += ('[url "https://gitlab-ci-token:%s@gitlab.com/"]\n'
+                             '\tinsteadOf = git@gitlab.com:\n' % (os.environ.get('CI_JOB_TOKEN')))
+
         with open(self.tmpdirname + '/.gitconfig', 'w') as fds:
-            fds.write('[User]\n'
-                      '\temail = kas@example.com\n'
-                      '\tname = Kas User\n')
+            fds.write(gitconfig)
         ctx.environ['HOME'] = self.tmpdirname
 
 
